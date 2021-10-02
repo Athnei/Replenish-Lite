@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "replenish-lite",
+  "version": "${version}",
+  "name": "Replenish-Lite",
+  "description": "",
+  "authors": [
+    "Atthnei"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Athnei/Replenish-Lite",
+    "sources": "https://github.com/Athnei/Replenish-Lite/releases/",
+    "issues": "https://github.com/Athnei/Replenish-Lite/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/replenish-lite/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.atthnei.replenish_lite.ReplenishLite"
+    ]
+  },
+  "mixins": [
+    "replenish-lite.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
