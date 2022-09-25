@@ -12,6 +12,9 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - name: checkout repository
+        uses: actions/checkout@v2
+        
       - name: validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
