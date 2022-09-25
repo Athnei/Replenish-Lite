@@ -41,14 +41,14 @@ public class ReplenishLite implements ModInitializer {
 
             if (hotbarIndex != -1) {
                 inventory.selectedSlot = hotbarIndex;
-                client.options.keyUse.setPressed(true);
+                client.options.useKey.setPressed(true);
                 return true;
             }
             return false;
         });
 
         keyBinding.onKeyUp(() -> {
-            client.options.keyUse.setPressed(false);
+            client.options.useKey.setPressed(false);
             client.player.getInventory().selectedSlot = slotIndexBeforePress;
             return false;
         });
