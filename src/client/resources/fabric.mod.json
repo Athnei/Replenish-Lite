@@ -24,10 +24,10 @@
     "replenish-lite.mixins.json"
   ],
   "depends": {
-    "minecraft": "~1.20.1",
-    "fabricloader": ">=0.14.22",
+    "minecraft": "~1.20.5",
+    "fabricloader": ">=0.15.10",
     "fabric-api": "*",
-    "java": ">=17"
+    "java": ">=21"
   },
   "suggests": {
     "another-mod": "*"
