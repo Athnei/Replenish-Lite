@@ -4,22 +4,22 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class ReplenishLite implements ModInitializer {
 
     public static final String MOD_ID = "replenish-lite";
-
-    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     private final ExtendedKeyBinding replenishKeyBinding = (ExtendedKeyBinding) KeyBindingHelper.registerKeyBinding(new ExtendedKeyBinding(
             MOD_ID + ".key.replenish-key",
@@ -66,7 +66,7 @@ public class ReplenishLite implements ModInitializer {
     private int GetHotbarIndexWithFood(PlayerInventory inventory) {
 
         ItemStack currentSlotItem = inventory.getStack(inventory.selectedSlot);
-        if (currentSlotItem.isFood() && !IsFoodHarmful(currentSlotItem.getItem())) {
+        if (currentSlotItem.contains(DataComponentTypes.FOOD) && !IsFoodHarmful(currentSlotItem.getItem())) {
             return inventory.selectedSlot;
         }
 
@@ -79,7 +79,7 @@ public class ReplenishLite implements ModInitializer {
 
             ItemStack itemStack = inventory.getStack(inventorySlotIndex);
 
-            if (itemStack.isFood() && !IsFoodHarmful(itemStack.getItem())) {
+            if (itemStack.contains(DataComponentTypes.FOOD) && !IsFoodHarmful(itemStack.getItem())) {
                 return inventorySlotIndex;
             }
         }
@@ -87,7 +87,7 @@ public class ReplenishLite implements ModInitializer {
         return -1;
     }
 
-    private static final Collection<StatusEffect> harmfulFoodEffects = List.of(
+    private static final List<RegistryEntry<StatusEffect>> harmfulFoodEffects = List.of(
             StatusEffects.POISON,
             StatusEffects.WITHER,
             StatusEffects.HUNGER,
@@ -97,7 +97,9 @@ public class ReplenishLite implements ModInitializer {
     );
 
     private boolean IsFoodHarmful(Item item) {
-        return item.getFoodComponent().getStatusEffects().stream()
-                .anyMatch(s -> harmfulFoodEffects.contains(s.getFirst().getEffectType()));
+        FoodComponent foodComponent = item.getDefaultStack().get(DataComponentTypes.FOOD);
+
+        return foodComponent.effects().stream()
+                .anyMatch(s -> harmfulFoodEffects.contains(s.effect()));
     }
 }

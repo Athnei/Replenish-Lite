@@ -9,7 +9,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        java: [17]
+        java: [21]
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
