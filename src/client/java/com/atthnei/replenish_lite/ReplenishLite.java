@@ -3,15 +3,15 @@ package com.atthnei.replenish_lite;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FoodComponent;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -31,55 +31,54 @@ public class ReplenishLite implements ModInitializer {
     @Override
     public void onInitialize() {
         ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
-
     }
 
-    private void onEndTick(MinecraftClient client) {
+    private void onEndTick(Minecraft client) {
         KeyBindingPressed(client, replenishKeyBinding);
     }
 
 
-    private void KeyBindingPressed(MinecraftClient client, ExtendedKeyBinding keyBinding) {
+    private void KeyBindingPressed(Minecraft client, ExtendedKeyBinding keyBinding) {
         assert client.player != null;
 
         keyBinding.onKeyDown(() -> {
-            PlayerInventory inventory = client.player.getInventory();
+            Inventory inventory = client.player.getInventory();
 
-            slotIndexBeforePress = inventory.selectedSlot;
+            slotIndexBeforePress = inventory.selected;
             int hotbarIndex = GetHotbarIndexWithFood(inventory);
 
             if (hotbarIndex != -1) {
-                inventory.selectedSlot = hotbarIndex;
-                client.options.useKey.setPressed(true);
+                inventory.selected = hotbarIndex;
+                client.options.keyUse.setDown(true);
                 return true;
             }
             return false;
         });
 
         keyBinding.onKeyUp(() -> {
-            client.options.useKey.setPressed(false);
-            client.player.getInventory().selectedSlot = slotIndexBeforePress;
+            client.options.keyUse.setDown(false);
+            client.player.getInventory().selected = slotIndexBeforePress;
             return false;
         });
     }
 
-    private int GetHotbarIndexWithFood(PlayerInventory inventory) {
+    private int GetHotbarIndexWithFood(Inventory inventory) {
 
-        ItemStack currentSlotItem = inventory.getStack(inventory.selectedSlot);
-        if (currentSlotItem.contains(DataComponentTypes.FOOD) && !IsFoodHarmful(currentSlotItem.getItem())) {
-            return inventory.selectedSlot;
+        ItemStack currentSlotItem = inventory.getItem(inventory.selected);
+        if (currentSlotItem.has(DataComponents.FOOD) && !IsFoodHarmful(currentSlotItem.getItem())) {
+            return inventory.selected;
         }
 
         List<Integer> remainingInventorySlotIndexes = IntStream.rangeClosed(1, 9)
                 .boxed()
-                .filter(slot -> slot != inventory.selectedSlot)
+                .filter(slot -> slot != inventory.selected)
                 .toList();
 
         for (int inventorySlotIndex : remainingInventorySlotIndexes) {
 
-            ItemStack itemStack = inventory.getStack(inventorySlotIndex);
+            var itemStack = inventory.getItem(inventorySlotIndex);
 
-            if (itemStack.contains(DataComponentTypes.FOOD) && !IsFoodHarmful(itemStack.getItem())) {
+            if (itemStack.has(DataComponents.FOOD) && !IsFoodHarmful(itemStack.getItem())) {
                 return inventorySlotIndex;
             }
         }
@@ -87,17 +86,17 @@ public class ReplenishLite implements ModInitializer {
         return -1;
     }
 
-    private static final List<RegistryEntry<StatusEffect>> harmfulFoodEffects = List.of(
-            StatusEffects.POISON,
-            StatusEffects.WITHER,
-            StatusEffects.HUNGER,
-            StatusEffects.NAUSEA,
-            StatusEffects.WEAKNESS,
-            StatusEffects.BLINDNESS
+    private static final List<Holder<MobEffect>> harmfulFoodEffects = List.of(
+            MobEffects.POISON,
+            MobEffects.WITHER,
+            MobEffects.HUNGER,
+            MobEffects.CONFUSION,
+            MobEffects.WEAKNESS,
+            MobEffects.BLINDNESS
     );
 
     private boolean IsFoodHarmful(Item item) {
-        FoodComponent foodComponent = item.getDefaultStack().get(DataComponentTypes.FOOD);
+        FoodProperties foodComponent = item.getDefaultInstance().get(DataComponents.FOOD);
 
         return foodComponent.effects().stream()
                 .anyMatch(s -> harmfulFoodEffects.contains(s.effect()));
