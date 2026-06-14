@@ -16,7 +16,7 @@
   "icon": "assets/replenish-lite/icon.png",
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "client": [
       "com.atthnei.replenish_lite.ReplenishLite"
     ]
   },
@@ -24,13 +24,9 @@
     "replenish-lite.mixins.json"
   ],
   "depends": {
-    "minecraft": "${mcversion}",
-    "fabricloader": ">=0.15.11",
-    "fabric-api": "*",
-    "java": ">=21"
-  },
-  "suggests": {
-    "another-mod": "*"
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.1.2",
+    "java": ">=25",
+    "fabric-api": "*"
   }
 }
-
