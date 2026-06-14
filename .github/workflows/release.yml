@@ -33,7 +33,7 @@ jobs:
 
       - name: Capture build artifacts
         id: upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: Artifacts
           path: |
@@ -49,7 +49,7 @@ jobs:
     steps:
       - name: Download artifact
         id: download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v7
         with:
           name: Artifacts
 
